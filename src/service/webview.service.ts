@@ -162,7 +162,9 @@ export class WebviewService {
           find: "@CHECKED",
           replace: "checked"
         }
-      ]
+      ],
+      htmlContent: "",
+      webview: null
     },
     {
       name: "settings",
@@ -184,7 +186,9 @@ export class WebviewService {
           find: "@ENV_MAP",
           replace: this.environmentSettings
         }
-      ]
+      ],
+      htmlContent: "",
+      webview: null
     },
     {
       name: "gist-selection",
@@ -198,7 +202,9 @@ export class WebviewService {
           find: "@SKIP",
           replace: "skip"
         }
-      ]
+      ],
+      htmlContent: "",
+      webview: null
     }
   ];
 

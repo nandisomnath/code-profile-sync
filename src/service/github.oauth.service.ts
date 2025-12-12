@@ -7,7 +7,7 @@ import { state } from "../state";
 
 export class GitHubOAuthService {
   public app: express.Express;
-  public server?: Server;
+  public server: Server|null = null;
 
   constructor(public port: number) {
     this.app = express();

@@ -119,11 +119,17 @@ export default class Commons {
   }
 
   public async GetCustomSettings(): Promise<CustomConfig> {
-    let customSettings: CustomConfig| null = new CustomConfig();
+    let customSettings: CustomConfig | null = new CustomConfig();
     try {
-      const customExist: boolean = await FileService.FileExists(state.environment?.FILE_CUSTOMIZEDSETTINGS!);
+      if (state.environment === null) {
+        throw new Error("state.environment is null");
+      }
+      if (state.environment.FILE_CUSTOMIZEDSETTINGS === null) {
+        throw new Error("state.environment.FILE_CUSTOMIZEDSETTINGS is null");
+      }
+      const customExist: boolean = await FileService.FileExists(state.environment.FILE_CUSTOMIZEDSETTINGS);
       if (customExist) {
-        const customSettingStr: string = await FileService.ReadFile(state.environment?.FILE_CUSTOMIZEDSETTINGS!);
+        const customSettingStr: string = await FileService.ReadFile(state.environment.FILE_CUSTOMIZEDSETTINGS);
         const tempObj = JSON.parse(customSettingStr);
 
         Object.assign(customSettings, tempObj);
@@ -134,8 +140,8 @@ export default class Commons {
       Commons.LogException(
         e,
         "Sync : Unable to read " +
-          state.environment?.FILE_CUSTOMIZEDSETTINGS_NAME +
-          ". Make sure its Valid JSON.",
+        state.environment?.FILE_CUSTOMIZEDSETTINGS_NAME +
+        ". Make sure its Valid JSON.",
         true
       );
       vscode.commands.executeCommand(
@@ -145,13 +151,24 @@ export default class Commons {
         )
       );
     }
-    return customSettings!;
+
+    if (customSettings === null) {
+      throw new Error("customSettings is null");
+    }
+
+    return customSettings;
   }
 
   public async SetCustomSettings(setting: CustomConfig): Promise<boolean> {
+    if (state.environment === null) {
+      throw new Error("state.environment is null");
+    }
+    if (state.environment.FILE_CUSTOMIZEDSETTINGS === null) {
+      throw new Error("state.environment.FILE_CUSTOMIZEDSETTINGS is null");
+    }
     try {
       await FileService.WriteFile(
-        state.environment?.FILE_CUSTOMIZEDSETTINGS!,
+        state.environment.FILE_CUSTOMIZEDSETTINGS,
         JSON.stringify(setting, null, 4)
       );
       return true;
@@ -159,7 +176,7 @@ export default class Commons {
       Commons.LogException(
         e,
         "Sync : Unable to write " +
-          state.environment?.FILE_CUSTOMIZEDSETTINGS_NAME,
+        state.environment.FILE_CUSTOMIZEDSETTINGS_NAME,
         true
       );
       return false;
@@ -233,7 +250,7 @@ export default class Commons {
             support,
             joinCommunity
           )
-          .then((val: string|undefined) => {
+          .then((val: string | undefined) => {
             if (val === releaseNotes) {
               vscode.commands.executeCommand(
                 "vscode.open",
@@ -283,7 +300,7 @@ export default class Commons {
 
     const keys = Object.keys(setting);
     keys.forEach(async keyName => {
-      
+
       if (setting[keyName as keyof ExtensionConfig] === null) {
         setting[keyName as keyof ExtensionConfig] = "" as any;
       }
@@ -352,8 +369,8 @@ export default class Commons {
     // settings.autoUpload = vscode.workspace.getConfiguration("sync").get("autoUpload");
     // settings.forceDownload = vscode.workspace.getConfiguration("sync").get("forceDownload");
     // settings.forceUpload = vscode.workspace.getConfiguration("sync").get("forceUpload");
-    
-    
+
+
     for (const key of Object.keys(settings)) {
       if (key !== "token") {
         settings[key as keyof ExtensionConfig] = vscode.workspace.getConfiguration("code-profile-sync").get(key)!;
@@ -363,7 +380,7 @@ export default class Commons {
     if (settings.gist === null) {
       throw new Error("setting.gist is null");
     }
-    
+
     settings.gist = settings.gist.trim();
     return settings;
   }
@@ -414,7 +431,7 @@ export default class Commons {
     const keysUpdated: Array<Thenable<void>> = [];
 
     for (const key of settings) {
-      let keyValue: object|null = null;
+      let keyValue: object | null = null;
       keyValue = config.get<null>(key, null);
       if (keyValue !== null) {
         ignoreSettings[key as keyof object] = keyValue;
@@ -459,9 +476,9 @@ export default class Commons {
   public ShowSummaryOutput(
     upload: boolean,
     files: File[],
-    removedExtensions: ExtensionInformation[]|null,
+    removedExtensions: ExtensionInformation[] | null,
     addedExtensions: ExtensionInformation[],
-    ignoredExtensions: ExtensionInformation[]|null,
+    ignoredExtensions: ExtensionInformation[] | null,
     syncSettings: LocalConfig
   ) {
     if (Commons.outputChannel === null) {
@@ -477,10 +494,9 @@ export default class Commons {
     outputChannel.appendLine(`Version: ${Environment.getVersion()}`);
     outputChannel.appendLine(`--------------------`);
     outputChannel.appendLine(
-      `GitHub Token: ${
-        syncSettings.customConfig.token
-          ? syncSettings.customConfig.token.slice(0, 4) + "**********"
-          : "Anonymous"
+      `GitHub Token: ${syncSettings.customConfig.token
+        ? syncSettings.customConfig.token.slice(0, 4) + "**********"
+        : "Anonymous"
       }`
     );
     outputChannel.appendLine(`GitHub Gist: ${syncSettings.extConfig.gist}`);
