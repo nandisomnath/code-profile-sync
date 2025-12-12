@@ -137,6 +137,6 @@ export class AutoUploadService {
 
     await Util.Sleep(customSettings.autoUploadDelay * 1000);
 
-    vscode.commands.executeCommand("extension.updateSettings", "forceUpdate");
+    vscode.commands.executeCommand("code-profile-sync.updateSettings", "forceUpdate");
   }
 }

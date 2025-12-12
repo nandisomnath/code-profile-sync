@@ -401,7 +401,7 @@ export class WebviewService {
           vscode.window.showInformationMessage(
             localize("cmd.otherOptions.warning.tokenNotRequire")
           );
-          vscode.commands.executeCommand("extension.downloadSettings");
+          vscode.commands.executeCommand("code-profile-sync.downloadSettings");
           break;
         case "dontShowThisAgain":
           if (state.context === null) {
@@ -427,7 +427,7 @@ export class WebviewService {
       items: webview.replaceables,
       gists,
       skip:
-        cmd !== "extension.downloadSettings"
+        cmd !== "code-profile-sync.downloadSettings"
           ? `<a href="#" onclick="vscode.postMessage({close: true});" title="Skip (new one will be created upon first upload)" class="btn btn-primary mt-4">Skip (new one will be created upon first upload)</a>`
           : ""
     });

@@ -43,7 +43,7 @@ export class Sync {
       if (gistAvailable) {
         if (startUpSetting.autoDownload) {
           vscode.commands
-            .executeCommand("extension.downloadSettings")
+            .executeCommand("code-profile-sync.downloadSettings")
             .then(async () => {
               if (
                 startUpSetting.autoUpload &&
@@ -487,7 +487,7 @@ export class Sync {
         : !localSettings.customConfig.token || !localSettings.extConfig.gist
     ) {
       state.commons.webviewService.OpenLandingPage(
-        "extension.downloadSettings"
+        "code-profile-sync.downloadSettings"
       );
       return;
     }
@@ -1030,11 +1030,11 @@ export class Sync {
         selectedItem = 6;
         settingChanged = true;
         if (!setting) {
-          vscode.commands.executeCommand("extension.HowSettings");
+          vscode.commands.executeCommand("code-profile-sync.HowSettings");
           return;
         }
         if (!gistAvailable) {
-          vscode.commands.executeCommand("extension.HowSettings");
+          vscode.commands.executeCommand("code-profile-sync.HowSettings");
           return;
         }
 
@@ -1046,7 +1046,7 @@ export class Sync {
         settingChanged = true;
 
         if (!tokenAvailable || !gistAvailable) {
-          vscode.commands.executeCommand("extension.HowSettings");
+          vscode.commands.executeCommand("code-profile-sync.HowSettings");
           return;
         }
         setting.quietSync = !setting.quietSync;
@@ -1162,7 +1162,7 @@ export class Sync {
               const callbackMap = {
                 1: async () => {
                   return await vscode.commands.executeCommand(
-                    "extension.updateSettings",
+                    "code-profile-sync.updateSettings",
                     "publicGIST"
                   );
                 },

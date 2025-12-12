@@ -14,40 +14,40 @@
     "Other"
   ],
   "activationEvents": [
-    "*"
+    "onStartupFinished"
   ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "extension.HowSettings",
+        "command": "code-profile-sync.HowSettings",
         "title": "%cmd.howSetting.title%"
       },
       {
-        "command": "extension.downloadSettings",
+        "command": "code-profile-sync.downloadSettings",
         "title": "%cmd.downloadSettings.title%"
       },
       {
-        "command": "extension.updateSettings",
+        "command": "code-profile-sync.updateSettings",
         "title": "%cmd.updateSettings.title%"
       },
       {
-        "command": "extension.resetSettings",
+        "command": "code-profile-sync.resetSettings",
         "title": "%cmd.resetSettings.title%"
       },
       {
-        "command": "extension.otherOptions",
+        "command": "code-profile-sync.otherOptions",
         "title": "%cmd.otherOptions.title%"
       }
     ],
     "keybindings": [
       {
         "key": "alt+shift+u",
-        "command": "extension.updateSettings"
+        "command": "code-profile-sync.updateSettings"
       },
       {
         "key": "alt+shift+d",
-        "command": "extension.downloadSettings"
+        "command": "code-profile-sync.downloadSettings"
       }
     ],
     "configuration": {
@@ -95,7 +95,8 @@
       },
       "title": "%ext.config.title%"
     }
-  },
+  }
+  ,
   "scripts": {
     "vscode:prepublish": "npm run package",
     "compile": "webpack",

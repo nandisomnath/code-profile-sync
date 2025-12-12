@@ -12,7 +12,7 @@ export async function activate(context: vscode.ExtensionContext) {
   
   context.subscriptions.push(
     vscode.commands.registerCommand(
-      "extension.updateSettings",
+      "code-profile-sync.updateSettings",
       (optArgument?: string) => {
         sync.upload.bind(sync, optArgument)();
       }
@@ -20,25 +20,25 @@ export async function activate(context: vscode.ExtensionContext) {
   );
   context.subscriptions.push(
     vscode.commands.registerCommand(
-      "extension.downloadSettings",
+      "code-profile-sync.downloadSettings",
       sync.download.bind(sync)
     )
   );
   context.subscriptions.push(
     vscode.commands.registerCommand(
-      "extension.resetSettings",
+      "code-profile-sync.resetSettings",
       sync.reset.bind(sync)
     )
   );
   context.subscriptions.push(
     vscode.commands.registerCommand(
-      "extension.HowSettings",
+      "code-profile-sync.HowSettings",
       sync.how.bind(sync)
     )
   );
   context.subscriptions.push(
     vscode.commands.registerCommand(
-      "extension.otherOptions",
+      "code-profile-sync.otherOptions",
       sync.advance.bind(sync)
     )
   );
