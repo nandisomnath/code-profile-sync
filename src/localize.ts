@@ -40,7 +40,7 @@ export class Localize {
     const languageFormat = "package.nls{0}.json";
     const defaultLanguage = languageFormat.replace("{0}", "");
 
-    const myExtension = extensions.getExtension("somnath.code-settings-sync");
+    const myExtension = extensions.getExtension("somnath.code-profile-sync");
 
     if (myExtension === undefined) {
       throw new Error("getExtension() is undefined");
