@@ -3,8 +3,8 @@ import Commons from "../commons";
 import { Environment } from "../environmentPath";
 
 export interface IExtensionState {
-  context?: ExtensionContext;
-  environment: Environment;
-  commons: Commons;
+  context: ExtensionContext|null;
+  environment: Environment|null;
+  commons: Commons|null;
   instanceID: string;
 }

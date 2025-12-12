@@ -39,17 +39,17 @@ export class FileService {
   public static async GetFile(
     filePath: string,
     fileName: string
-  ): Promise<File|null> {
+  ): Promise<File> {
     const fileExists: boolean = await FileService.FileExists(filePath);
 
     if (!fileExists) {
-      return null;
+      throw new Error(`${filePath} not found`);
     }
 
     const content = await FileService.ReadFile(filePath);
 
     if (content === null) {
-      return null;
+      throw new Error(`No data in ${filePath} file`);
     }
 
     const pathFromUser: string = filePath.substring(
@@ -99,7 +99,7 @@ export class FileService {
   public static async ListFiles(
     directory: string,
     customSettings: CustomConfig
-  ): Promise<(File|null)[]> {
+  ): Promise<File[]> {
     function folderMatcher(file: string, stats: fs.Stats) {
       if (stats.isDirectory()) {
         return customSettings.ignoreUploadFolders.some(fold => {
@@ -146,7 +146,7 @@ export class FileService {
       paths = fileName.split("\\");
     }
 
-    if (paths != null) {
+    if (paths !== null) {
       for (let i = 0; i < paths.length - 1; i++) {
         const element = paths[i];
         fullPath += element + path.sep;

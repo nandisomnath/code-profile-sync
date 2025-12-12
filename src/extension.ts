@@ -7,11 +7,9 @@ import { Sync } from "./sync";
 export async function activate(context: vscode.ExtensionContext) {
   state.context = context;
   state.environment = new Environment();
-
   const sync = new Sync();
-
   sync.bootstrap();
-
+  
   context.subscriptions.push(
     vscode.commands.registerCommand(
       "extension.updateSettings",

@@ -134,18 +134,25 @@ export class GitHubService {
   // This should return GitHubApi.Response<GitHubApi.GistsGetResponse> but Types are wrong
   public async ReadGist(
     GIST: string
-  ): Promise<Octokit.Response<IFixGistResponse>|undefined> {
+  ): Promise<Octokit.Response<IFixGistResponse>> {
     const promise = this.github!.gists.get({ gist_id: GIST });
     const res = await promise.catch(err => {
       if (String(err).includes("HttpError: Not Found")) {
         return Commons.LogException(err, "Sync: Invalid Gist ID", true);
       }
+
+      if (state.commons === null) {
+        throw new Error("state.commons is null");
+      }
+
       Commons.LogException(err, state.commons.ERROR_MESSAGE, true);
     });
     if (res) {
       return res;
     }
-    return undefined;
+    
+    throw new Error("ReadGist() failed");
+
   }
 
   public async IsGistNewer(
@@ -198,6 +205,9 @@ export class GitHubService {
     const res = await promise.catch(err => {
       if (String(err).includes("HttpError: Not Found")) {
         return Commons.LogException(err, "Sync: Invalid Gist ID", true);
+      }
+      if (state.commons === null) {
+        throw new Error("state.commons is null");
       }
       Commons.LogException(err, state.commons.ERROR_MESSAGE, true);
     });

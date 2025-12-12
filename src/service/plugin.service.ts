@@ -58,10 +58,10 @@ export class ExtensionInformation {
     return extList;
   }
 
-  public metadata?: ExtensionMetadata;
-  public name?: string;
-  public version?: string;
-  public publisher?: string;
+  public metadata: ExtensionMetadata|null = null;
+  public name: string|null = null;
+  public version: string|null = null;
+  public publisher: string|null = null;
 }
 
 export class ExtensionMetadata {

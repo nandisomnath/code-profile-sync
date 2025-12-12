@@ -14,6 +14,7 @@ import { File, FileService } from "./service/file.service";
 import { GitHubService } from "./service/github.service";
 import { ExtensionInformation, PluginService } from "./service/plugin.service";
 import { state } from "./state";
+import assert from "assert";
 
 export class Sync {
   /**
@@ -28,9 +29,9 @@ export class Sync {
 
     if (startUpSetting) {
       const tokenAvailable: boolean =
-        startUpCustomSetting.token != null && startUpCustomSetting.token !== "";
+        startUpCustomSetting.token !== null && startUpCustomSetting.token !== "";
       const gistAvailable: boolean =
-        startUpSetting.gist != null && startUpSetting.gist !== "";
+        startUpSetting.gist !== null && startUpSetting.gist !== "";
 
       if (!startUpCustomSetting.downloadPublicGist && !tokenAvailable) {
         if (state.commons.webviewService.IsLandingPageEnabled()) {
@@ -69,10 +70,14 @@ export class Sync {
     // @ts-ignore
     // const args = arguments;
     let github: GitHubService = null;
-    const localConfig = await state.commons?.InitalizeSettings();
+    
+    if (state.commons === null) {
+      throw new Error("state.commons is null");
+    }
+    const localConfig = await state.commons.InitalizeSettings();
 
-    if (!localConfig?.customConfig.token) {
-      state.commons?.webviewService.OpenLandingPage("extension.updateSettings");
+    if (!localConfig.customConfig.token) {
+      state.commons.webviewService.OpenLandingPage("extension.updateSettings");
       return;
     }
 
@@ -113,7 +118,7 @@ export class Sync {
       );
 
       if (customSettings.downloadPublicGist) {
-        if (customSettings.token == null || customSettings.token === "") {
+        if (customSettings.token === null || customSettings.token === "") {
           vscode.window.showInformationMessage(
             localize("cmd.updateSettings.warning.noToken")
           );
@@ -143,7 +148,14 @@ export class Sync {
             return true;
           });
         }
+
+        
+
         uploadedExtensions.sort((a, b) => a.name!.localeCompare(b.name!));
+        
+        if (state.environment === null) {
+          throw new Error("state.environment is null");
+        }
         const extensionFileName = state.environment.FILE_EXTENSION_NAME;
         const extensionFilePath = state.environment.FILE_EXTENSION;
         const extensionFileContent = JSON.stringify(
@@ -160,8 +172,17 @@ export class Sync {
         allSettingFiles.push(extensionFile);
       }
 
+
+      if (state.environment === null) {
+        throw new Error("state.environment is null.");
+      }
+
+      if (state.environment.USER_FOLDER === null) {
+        throw new Error("state.environment.USER_FOLDER is null");
+      }
+
       const contentFiles = await FileService.ListFiles(
-        state.environment.USER_FOLDER!,
+        state.environment.USER_FOLDER,
         customSettings
       );
 
@@ -182,25 +203,30 @@ export class Sync {
           }
         }
       } else {
+
+        if (state.commons === null) {
+          throw new Error("state.commons is null");
+        }
+
         Commons.LogException(null, state.commons.ERROR_MESSAGE, true);
         return;
       }
       for (const snippetFile of contentFiles) {
-        if (snippetFile?.fileName !== state.environment.FILE_KEYBINDING_MAC) {
-          if (snippetFile?.content !== "") {
+        if (snippetFile.fileName !== state.environment.FILE_KEYBINDING_MAC) {
+          if (snippetFile.content !== "") {
             if (
-              snippetFile?.fileName === state.environment.FILE_KEYBINDING_NAME
+              snippetFile.fileName === state.environment.FILE_KEYBINDING_NAME
             ) {
-              snippetFile!.gistName =
+              snippetFile.gistName =
                 state.environment.OsType === OsType.MAC &&
-                !customSettings.universalKeybindings
+                customSettings.universalKeybindings
                   ? state.environment.FILE_KEYBINDING_MAC
                   : state.environment.FILE_KEYBINDING_DEFAULT;
             }
             if (
-              snippetFile?.fileName === state.environment.FILE_SETTING_NAME ||
-              snippetFile?.fileName === state.environment.FILE_KEYBINDING_MAC ||
-              snippetFile?.fileName === state.environment.FILE_KEYBINDING_DEFAULT
+              snippetFile.fileName === state.environment.FILE_SETTING_NAME ||
+              snippetFile.fileName === state.environment.FILE_KEYBINDING_MAC ||
+              snippetFile.fileName === state.environment.FILE_KEYBINDING_DEFAULT
             ) {
               try {
                 const parsedContent = await PragmaUtil.processBeforeUpload(
@@ -231,12 +257,15 @@ export class Sync {
       try {
         if (syncSetting.gist === null || syncSetting.gist === "") {
           if (customSettings.askGistDescription) {
+            if (state.commons === null) {
+              throw new Error("tate.commons is null");
+            }
             customSettings.gistDescription = await state.commons.AskGistDescription();
           }
           newGIST = true;
           const gistID = await github.CreateEmptyGIST(
             localConfig.publicGist,
-            customSettings.gistDescription!);
+            customSettings.gistDescription);
           if (gistID) {
             syncSetting.gist = gistID;
             vscode.window.setStatusBarMessage(
@@ -251,7 +280,7 @@ export class Sync {
           }
         }
 
-        let gistObj = await github.ReadGist(syncSetting.gist!);
+        let gistObj = await github.ReadGist(syncSetting.gist);
 
         if (!gistObj) {
           return;
@@ -259,7 +288,7 @@ export class Sync {
 
         if (gistObj.data.owner !== null) {
           const gistOwnerName: string = gistObj.data.owner.login.trim();
-          if (github.userName != null) {
+          if (github.userName !== null) {
             const userName: string = github.userName.trim();
             if (gistOwnerName !== userName) {
               Commons.LogException(
@@ -292,7 +321,7 @@ export class Sync {
               return true;
             }
             if (
-              gistObj!.data.files[fileToUpload.gistName].content !==
+              gistObj.data.files[fileToUpload.gistName].content !==
               fileToUpload.content
             ) {
               console.info(`Sync: file ${fileToUpload.gistName} has changed`);

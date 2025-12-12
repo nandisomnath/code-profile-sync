@@ -437,12 +437,19 @@ export default class Commons {
   /**
    * AskGistDescription
    */
-  public async AskGistDescription(): Promise<string|undefined> {
-    return vscode.window.showInputBox({
+  public async AskGistDescription(): Promise<string> {
+    const value = await vscode.window.showInputBox({
       prompt: localize("common.prompt.multipleGist"),
       ignoreFocusOut: true,
       placeHolder: localize("common.placeholder.multipleGist")
     });
+
+    if (value === undefined) {
+      throw new Error("AskGistDescription() is undefinded");
+    }
+
+    return value;
+
   }
 
   public ShowSummaryOutput(
