@@ -15,19 +15,19 @@ export class CustomConfig {
   ];
   public ignoreUploadFolders: string[] = ["workspaceStorage"];
   public ignoreExtensions: string[] = [];
-  public gistDescription: string = "Visual Studio Code Settings Sync Gist";
+  public gistDescription?: string = "Visual Studio Code Settings Sync Gist";
   public version: number = Environment.CURRENT_VERSION;
   public token: string = "";
   public downloadPublicGist: boolean = false;
   public supportedFileExtensions: string[] = ["json", "code-snippets"];
   public openTokenLink: boolean = true;
   public disableUpdateMessage: boolean = false;
-  public lastUpload: Date = null;
-  public lastDownload: Date = null;
-  public githubEnterpriseUrl: string = null;
+  public lastUpload: Date|null = null;
+  public lastDownload: Date|null = null;
+  public githubEnterpriseUrl: string|null = null;
   public askGistDescription: boolean = false;
   public customFiles: { [key: string]: string } = {};
-  public hostName: string = null;
+  public hostName: string|null = null;
   public universalKeybindings: boolean = false;
   public autoUploadDelay: number = 20;
 }

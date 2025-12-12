@@ -449,9 +449,9 @@ export default class Commons {
   public ShowSummaryOutput(
     upload: boolean,
     files: File[],
-    removedExtensions: ExtensionInformation[],
+    removedExtensions: ExtensionInformation[]|null,
     addedExtensions: ExtensionInformation[],
-    ignoredExtensions: ExtensionInformation[],
+    ignoredExtensions: ExtensionInformation[]|null,
     syncSettings: LocalConfig
   ) {
     if (Commons.outputChannel === null) {

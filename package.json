@@ -107,8 +107,10 @@
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
+    "@types/lockfile": "^1.0.4",
     "@types/mocha": "^10.0.10",
     "@types/node": "22.x",
+    "@types/recursive-readdir": "^2.2.4",
     "@types/vscode": "^1.107.0",
     "@vscode/test-cli": "^0.0.12",
     "@vscode/test-electron": "^2.5.2",
@@ -120,6 +122,8 @@
     "webpack-cli": "^6.0.1"
   },
   "dependencies": {
-    "fs-extra": "^11.3.2"
+    "fs-extra": "^11.3.2",
+    "lockfile": "^1.0.4",
+    "recursive-readdir": "^2.2.3"
   }
 }

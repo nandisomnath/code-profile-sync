@@ -49,7 +49,7 @@ export class Sync {
                 tokenAvailable &&
                 gistAvailable
               ) {
-                await state.commons.HandleStartWatching();
+                await state.commons?.HandleStartWatching();
                 return;
               }
             });
@@ -69,10 +69,10 @@ export class Sync {
     // @ts-ignore
     // const args = arguments;
     let github: GitHubService = null;
-    const localConfig = await state.commons.InitalizeSettings();
+    const localConfig = await state.commons?.InitalizeSettings();
 
-    if (!localConfig.customConfig.token) {
-      state.commons.webviewService.OpenLandingPage("extension.updateSettings");
+    if (!localConfig?.customConfig.token) {
+      state.commons?.webviewService.OpenLandingPage("extension.updateSettings");
       return;
     }
 
@@ -80,7 +80,7 @@ export class Sync {
     let uploadedExtensions: ExtensionInformation[] = [];
     const ignoredExtensions: ExtensionInformation[] = [];
     const dateNow = new Date();
-    await state.commons.HandleStopWatching();
+    await state.commons?.HandleStopWatching();
 
     try {
       localConfig.publicGist = false;
@@ -90,7 +90,7 @@ export class Sync {
 
       github = new GitHubService(
         localConfig.customConfig.token,
-        localConfig.customConfig.githubEnterpriseUrl
+        localConfig.customConfig.githubEnterpriseUrl!
       );
 
       await startGitProcess.call(
@@ -99,7 +99,7 @@ export class Sync {
         localConfig.customConfig
       );
     } catch (error) {
-      Commons.LogException(error, state.commons.ERROR_MESSAGE, true);
+      Commons.LogException(error, state.commons?.ERROR_MESSAGE!, true);
       return;
     }
 
@@ -154,19 +154,19 @@ export class Sync {
         const extensionFile: File = new File(
           extensionFileName,
           extensionFileContent,
-          extensionFilePath,
+          extensionFilePath!,
           extensionFileName
         );
         allSettingFiles.push(extensionFile);
       }
 
       const contentFiles = await FileService.ListFiles(
-        state.environment.USER_FOLDER,
+        state.environment.USER_FOLDER!,
         customSettings
       );
 
       const customExist: boolean = await FileService.FileExists(
-        state.environment.FILE_CUSTOMIZEDSETTINGS
+        state.environment.FILE_CUSTOMIZEDSETTINGS!
       );
       if (customExist) {
         const customFileKeys: string[] = Object.keys(
@@ -192,7 +192,7 @@ export class Sync {
               snippetFile.fileName === state.environment.FILE_KEYBINDING_NAME
             ) {
               snippetFile.gistName =
-                state.environment.OsType === OsType.Mac &&
+                state.environment.OsType === OsType.MAC &&
                 !customSettings.universalKeybindings
                   ? state.environment.FILE_KEYBINDING_MAC
                   : state.environment.FILE_KEYBINDING_DEFAULT;
@@ -207,7 +207,7 @@ export class Sync {
                   snippetFile.content
                 );
                 snippetFile.content = parsedContent;
-              } catch (e) {
+              } catch (e: any) {
                 Commons.LogException(null, e.message, true);
                 console.error(e);
                 return;
@@ -229,15 +229,14 @@ export class Sync {
 
       let newGIST: boolean = false;
       try {
-        if (syncSetting.gist == null || syncSetting.gist === "") {
+        if (syncSetting.gist === null || syncSetting.gist === "") {
           if (customSettings.askGistDescription) {
             customSettings.gistDescription = await state.commons.AskGistDescription();
           }
           newGIST = true;
           const gistID = await github.CreateEmptyGIST(
             localConfig.publicGist,
-            customSettings.gistDescription
-          );
+            customSettings.gistDescription!);
           if (gistID) {
             syncSetting.gist = gistID;
             vscode.window.setStatusBarMessage(
@@ -252,7 +251,7 @@ export class Sync {
           }
         }
 
-        let gistObj = await github.ReadGist(syncSetting.gist);
+        let gistObj = await github.ReadGist(syncSetting.gist!);
 
         if (!gistObj) {
           return;
@@ -314,8 +313,8 @@ export class Sync {
         } else {
           // Gist files are different from the local files.
           const gistNewer = await github.IsGistNewer(
-            syncSetting.gist,
-            customSettings.lastDownload
+            syncSetting.gist!,
+            customSettings.lastDownload!
           );
           if (!customSettings.lastDownload) {
             // Unable to compare the last gist upload time with the
@@ -382,7 +381,7 @@ export class Sync {
             vscode.window.showInformationMessage(
               localize(
                 "cmd.updateSettings.info.uploadingDone",
-                syncSetting.gist
+                syncSetting.gist!
               )
             );
           }
@@ -451,7 +450,7 @@ export class Sync {
     ) {
       const github = new GitHubService(
         customSettings.token,
-        customSettings.githubEnterpriseUrl
+        customSettings.githubEnterpriseUrl!
       );
       vscode.window.setStatusBarMessage("").dispose();
       vscode.window.setStatusBarMessage(
@@ -459,7 +458,7 @@ export class Sync {
         2000
       );
 
-      const res = await github.ReadGist(syncSetting.gist);
+      const res = await github.ReadGist(syncSetting.gist!);
 
       if (!res) {
         return;
@@ -543,13 +542,13 @@ export class Sync {
                 }
               } else {
                 if (
-                  state.environment.OsType === OsType.Mac &&
+                  state.environment.OsType === OsType.MAC &&
                   gistName === state.environment.FILE_KEYBINDING_DEFAULT
                 ) {
                   return;
                 }
                 if (
-                  state.environment.OsType !== OsType.Mac &&
+                  state.environment.OsType !== OsType.MAC &&
                   gistName === state.environment.FILE_KEYBINDING_MAC
                 ) {
                   return;
@@ -582,7 +581,7 @@ export class Sync {
                     content,
                     ignoredExtensions
                   );
-                } catch (err) {
+                } catch (err:any) {
                   vscode.window.showErrorMessage(
                     localize("cmd.downloadSettings.error.removeExtFail")
                   );
@@ -608,7 +607,7 @@ export class Sync {
                   ignoredExtensions,
                   (message: string, dispose: boolean) => {
                     if (!syncSetting.quietSync) {
-                      Commons.outputChannel.appendLine(message);
+                      Commons.outputChannel!.appendLine(message);
                     } else {
                       console.log(message);
                       if (dispose) {
@@ -620,7 +619,7 @@ export class Sync {
                     }
                   }
                 );
-              } catch (err) {
+              } catch (err:any) {
                 throw new Error(err);
               }
             }
@@ -631,7 +630,7 @@ export class Sync {
               file.gistName === state.environment.FILE_KEYBINDING_MAC
             ) {
               let test: string = "";
-              state.environment.OsType === OsType.Mac &&
+              state.environment.OsType === OsType.MAC &&
               !customSettings.universalKeybindings
                 ? (test = state.environment.FILE_KEYBINDING_MAC)
                 : (test = state.environment.FILE_KEYBINDING_DEFAULT);
@@ -648,7 +647,7 @@ export class Sync {
                 filePath = await FileService.CreateCustomDirTree(file.filePath);
               } else {
                 filePath = await FileService.CreateDirTree(
-                  state.environment.USER_FOLDER,
+                  state.environment.USER_FOLDER!,
                   file.fileName
                 );
               }
@@ -665,8 +664,8 @@ export class Sync {
                   content = PragmaUtil.processBeforeWrite(
                     localContent,
                     content,
-                    state.environment.OsType,
-                    localSettings.customConfig.hostName
+                    state.environment.OsType!,
+                    localSettings.customConfig.hostName!
                   );
                 }
               }
@@ -736,8 +735,8 @@ export class Sync {
    * Reset the setting to Sync
    */
   public async reset(): Promise<void> {
-    let extSettings: ExtensionConfig = null;
-    let localSettings: CustomConfig = null;
+    let extSettings: ExtensionConfig|null = null;
+    let localSettings: CustomConfig|null = null;
 
     vscode.window.setStatusBarMessage(
       localize("cmd.resetSettings.info.resetting"),
@@ -749,22 +748,22 @@ export class Sync {
       localSettings = new CustomConfig();
 
       await Promise.all([
-        state.context.globalState.update("landingPage.dontShowThisAgain", false)
+        state.context!.globalState.update("landingPage.dontShowThisAgain", false)
       ]);
 
       const [extSaved, customSaved, lockExist] = await Promise.all([
         state.commons.SaveSettings(extSettings),
         state.commons.SetCustomSettings(localSettings),
-        FileService.FileExists(state.environment.FILE_SYNC_LOCK)
+        FileService.FileExists(state.environment.FILE_SYNC_LOCK!)
       ]);
 
       if (!lockExist) {
-        fs.closeSync(fs.openSync(state.environment.FILE_SYNC_LOCK, "w"));
+        fs.closeSync(fs.openSync(state.environment.FILE_SYNC_LOCK!, "w"));
       }
 
       // check is sync locking
-      if (await lockfile.Check(state.environment.FILE_SYNC_LOCK)) {
-        await lockfile.Unlock(state.environment.FILE_SYNC_LOCK);
+      if (await lockfile.Check(state.environment.FILE_SYNC_LOCK!)) {
+        await lockfile.Unlock(state.environment.FILE_SYNC_LOCK!);
       }
 
       if (extSaved && customSaved) {
@@ -828,7 +827,11 @@ export class Sync {
       "cmd.otherOptions.joinCommunity",
       "cmd.otherOptions.openIssue",
       "cmd.otherOptions.releaseNotes"
-    ].map(localize);
+    ].map((value, index, array) => {
+      return localize(value, ...array);
+    });
+
+    type CallbackKey = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
     let selectedItem: number = 0;
     let settingChanged: boolean = false;
@@ -848,7 +851,7 @@ export class Sync {
       },
       async () => {
         const file: vscode.Uri = vscode.Uri.file(
-          state.environment.FILE_CUSTOMIZEDSETTINGS
+          state.environment.FILE_CUSTOMIZEDSETTINGS!
         );
         fs.openSync(file.fsPath, "r");
         const document = await vscode.workspace.openTextDocument(file);
@@ -1084,8 +1087,8 @@ export class Sync {
                 }
               };
 
-              if (callbackMap[selectedItem]) {
-                return callbackMap[selectedItem]();
+              if (callbackMap[selectedItem as CallbackKey]) {
+                return callbackMap[selectedItem as CallbackKey]();
               }
             } else {
               return vscode.window.showErrorMessage(
@@ -1113,9 +1116,9 @@ export class Sync {
   ): Promise<File[]> {
     const github = new GitHubService(
       customSettings.token,
-      customSettings.githubEnterpriseUrl
+      customSettings.githubEnterpriseUrl!
     );
-    const res = await github.ReadGist(syncSetting.gist);
+    const res = await github.ReadGist(syncSetting.gist!);
     if (!res) {
       return [];
     }

@@ -9,7 +9,7 @@ export class File {
   constructor(
     public fileName: string,
     public content: string,
-    public filePath: string,
+    public filePath: string|null,
     public gistName: string
   ) {}
 }
