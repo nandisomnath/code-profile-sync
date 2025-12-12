@@ -277,9 +277,8 @@ export default class Commons {
     return true;
   }
 
-  // todo: fix me
   public async SaveSettings(setting: ExtensionConfig): Promise<boolean> {
-    const config = vscode.workspace.getConfiguration("sync");
+    const config = vscode.workspace.getConfiguration("code-profile-sync");
     const allKeysUpdated = new Array<Thenable<void>>();
 
     const keys = Object.keys(setting);
@@ -357,7 +356,7 @@ export default class Commons {
     
       for (const key of Object.keys(settings)) {
       if (key !== "token") {
-        settings[key as keyof ExtensionConfig] = vscode.workspace.getConfiguration("sync").get(key);
+        settings[key as keyof ExtensionConfig] = vscode.workspace.getConfiguration("code-profile-sync").get(key);
       }
     }
     

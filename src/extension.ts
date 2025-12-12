@@ -3,6 +3,7 @@ import { Environment } from "./environmentPath";
 import { state } from "./state";
 import { Sync } from "./sync";
 
+
 export async function activate(context: vscode.ExtensionContext) {
   state.context = context;
   state.environment = new Environment();

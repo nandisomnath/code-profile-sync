@@ -3,6 +3,7 @@
 'use strict';
 
 const path = require('path');
+const { webpack, IgnorePlugin } = require('webpack');
 
 //@ts-check
 /** @typedef {import('webpack').Configuration} WebpackConfig **/
@@ -44,5 +45,12 @@ const extensionConfig = {
   infrastructureLogging: {
     level: "log", // enables logging required for problem matchers
   },
+
+   plugins: [
+    new IgnorePlugin({
+      resourceRegExp: /^vscode-fsevents$/ // ignore this optional module
+    })
+  ],
+
 };
 module.exports = [ extensionConfig ];

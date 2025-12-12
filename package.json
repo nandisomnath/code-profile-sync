@@ -3,7 +3,7 @@
   "displayName": "Profile Sync",
   "description": "This is a Profile sync extension for code",
   "version": "0.0.1",
-  "publisher": "Somnath",
+  "publisher": "somnath",
   "author": {
     "name": "Somnath Nandi"
   },
@@ -50,42 +50,42 @@
     ],
     "configuration": {
       "properties": {
-        "sync.gist": {
+        "code-profile-sync.gist": {
           "type": "string",
           "default": "",
           "description": "%ext.config.gist%"
         },
-        "sync.autoDownload": {
+        "code-profile-sync.autoDownload": {
           "type": "boolean",
           "default": false,
           "description": "%ext.config.autoDownload%"
         },
-        "sync.autoUpload": {
+        "code-profile-sync.autoUpload": {
           "type": "boolean",
           "default": false,
           "description": "%ext.config.autoUpload%"
         },
-        "sync.forceDownload": {
+        "code-profile-sync.forceDownload": {
           "type": "boolean",
           "default": false,
           "description": "%ext.config.forceDownload%"
         },
-        "sync.forceUpload": {
+        "code-profile-sync.forceUpload": {
           "type": "boolean",
           "default": false,
           "description": "%ext.config.forceUpload%"
         },
-        "sync.quietSync": {
+        "code-profile-sync.quietSync": {
           "type": "boolean",
           "default": false,
           "description": "%ext.config.quietSync%"
         },
-        "sync.removeExtensions": {
+        "code-profile-sync.removeExtensions": {
           "type": "boolean",
           "default": true,
           "description": "%ext.config.removeExtensions%"
         },
-        "sync.syncExtensions": {
+        "code-profile-sync.syncExtensions": {
           "type": "boolean",
           "default": true,
           "description": "%ext.config.syncExtensions%"
