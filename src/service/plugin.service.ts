@@ -21,7 +21,7 @@ export class ExtensionInformation {
       item.publisher = obj.publisher;
       item.version = obj.version;
       return item;
-    } catch (err) {
+    } catch (err: any) {
       throw new Error(err);
     }
   }
@@ -32,7 +32,7 @@ export class ExtensionInformation {
       // TODO: JSON.parse may throw error
       // Throw custom error should be more friendly
       const list = JSON.parse(text);
-      list.forEach(obj => {
+      list.forEach((obj: any) => {
         const meta = new ExtensionMetadata(
           obj.metadata.galleryApiUrl,
           obj.metadata.id,
@@ -51,17 +51,17 @@ export class ExtensionInformation {
           extList.push(item);
         }
       });
-    } catch (err) {
+    } catch (err: any) {
       throw new Error(err);
     }
 
     return extList;
   }
 
-  public metadata: ExtensionMetadata;
-  public name: string;
-  public version: string;
-  public publisher: string;
+  public metadata?: ExtensionMetadata;
+  public name?: string;
+  public version?: string;
+  public publisher?: string;
 }
 
 export class ExtensionMetadata {
@@ -85,7 +85,7 @@ export class PluginService {
 
     return remoteList.filter(
       ext =>
-        !ignoredExtensions.includes(ext.name) &&
+        !ignoredExtensions.includes(ext.name!) &&
         !localList.map(e => e.name).includes(ext.name)
     );
   }
@@ -118,7 +118,7 @@ export class PluginService {
       ext =>
         ext.name !== "code-settings-sync" &&
         !remoteExtensions.map(e => e.name).includes(ext.name) &&
-        !ignoredExtensions.includes(ext.name)
+        !ignoredExtensions.includes(ext.name!)
     );
   }
 
@@ -157,7 +157,7 @@ export class PluginService {
         `${extension.publisher}.${extension.name}`
       );
       return true;
-    } catch (err) {
+    } catch (err: any) {
       throw new Error(err);
     }
   }
@@ -234,7 +234,7 @@ export class PluginService {
         );
         notificationCallBack("");
         addedExtensions.push(ext);
-      } catch (err) {
+      } catch (err: any) {
         throw new Error(err);
       }
     }

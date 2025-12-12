@@ -1,4 +1,4 @@
-import * as express from "express";
+import express from "express";
 import { Server } from "http";
 import fetch from "node-fetch";
 import { URL, URLSearchParams } from "url";
@@ -7,7 +7,7 @@ import { state } from "../state";
 
 export class GitHubOAuthService {
   public app: express.Express;
-  public server: Server;
+  public server?: Server;
 
   constructor(public port: number) {
     this.app = express();
@@ -24,7 +24,7 @@ export class GitHubOAuthService {
     this.app.get("/callback", async (req, res) => {
       try {
         const params = new URLSearchParams(
-          await (await this.getToken(req.param("code"), host)).text()
+          await (await this.getToken(req.query.code as string, host)).text()
         );
 
         res.send(`
@@ -55,7 +55,7 @@ export class GitHubOAuthService {
           </body>
         </html>
         `);
-        this.server.close();
+        this.server!.close();
 
         const token = params.get("access_token");
         this.saveToken(token!);

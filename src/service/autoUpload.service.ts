@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { watch } from "vscode-chokidar";
+import { FSWatcher, watch } from "vscode-chokidar";
 import localize from "../localize";
 import lockfile from "../lockfile";
 import { CustomConfig } from "../models/customConfig.model";
@@ -16,26 +16,28 @@ export class AutoUploadService {
   }
 
   public watching = false;
+  private watcher?: FSWatcher;
 
-  private watcher = watch(state.environment.USER_FOLDER, {
+  constructor(private ignored: string[]) {
+
+    this.watcher = watch(state.environment.USER_FOLDER!, {
     depth: 2,
     ignored: this.ignored
   });
 
-  constructor(private ignored: string[]) {
     vscode.extensions.onDidChange(async () => {
       if (this.watching && vscode.window.state.focused) {
         console.log("Sync: Extensions changed");
-        if (await lockfile.Check(state.environment.FILE_SYNC_LOCK)) {
+        if (await lockfile.Check(state.environment.FILE_SYNC_LOCK!)) {
           return;
         } else {
-          await lockfile.Lock(state.environment.FILE_SYNC_LOCK);
+          await lockfile.Lock(state.environment.FILE_SYNC_LOCK!);
         }
         const customConfig = await state.commons.GetCustomSettings();
         if (!customConfig.downloadPublicGist) {
           await this.InitiateAutoUpload();
         }
-        await lockfile.Unlock(state.environment.FILE_SYNC_LOCK);
+        await lockfile.Unlock(state.environment.FILE_SYNC_LOCK!);
         return;
       }
     });
@@ -46,13 +48,13 @@ export class AutoUploadService {
 
     this.watching = true;
 
-    this.watcher.addListener("change", async (path: string) => {
+    this.watcher!.addListener("change", async (path: string) => {
       if (this.watching && vscode.window.state.focused) {
         console.log(`Sync: ${FileService.ExtractFileName(path)} changed`);
-        if (await lockfile.Check(state.environment.FILE_SYNC_LOCK)) {
+        if (await lockfile.Check(state.environment.FILE_SYNC_LOCK!)) {
           return;
         } else {
-          await lockfile.Lock(state.environment.FILE_SYNC_LOCK);
+          await lockfile.Lock(state.environment.FILE_SYNC_LOCK!);
         }
 
         const customConfig = await state.commons.GetCustomSettings();
@@ -67,7 +69,7 @@ export class AutoUploadService {
             await this.InitiateAutoUpload();
           }
         }
-        await lockfile.Unlock(state.environment.FILE_SYNC_LOCK);
+        await lockfile.Unlock(state.environment.FILE_SYNC_LOCK!);
         return;
       }
     });
@@ -87,7 +89,7 @@ export class AutoUploadService {
     vscode.window.setStatusBarMessage(
       localize("common.info.initAutoUpload").replace(
         "{0}",
-        customSettings.autoUploadDelay
+        String(customSettings.autoUploadDelay)
       ),
       5000
     );

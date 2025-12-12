@@ -207,7 +207,7 @@ export class WebviewService {
       return {
         ...view,
         htmlContent: readFileSync(
-          `${state.context.extensionPath}/ui/${view.name}/${view.htmlPath}`,
+          `${state.context!.extensionPath}/ui/${view.name}/${view.htmlPath}`,
           "utf-8"
         )
       };
@@ -308,13 +308,13 @@ export class WebviewService {
         state.commons.SetCustomSettings(customSettings);
       }
     } else {
-      extSettings[message.command] = value;
+      extSettings[message.command as keyof ExtensionConfig] = value;
       state.commons.SaveSettings(extSettings);
     }
   }
 
   public IsLandingPageEnabled(): boolean {
-    return !state.context.globalState.get<boolean>(
+    return !state.context!.globalState.get<boolean>(
       "landingPage.dontShowThisAgain"
     );
   }
@@ -389,7 +389,7 @@ export class WebviewService {
           vscode.commands.executeCommand("extension.downloadSettings");
           break;
         case "dontShowThisAgain":
-          await state.context.globalState.update(
+          await state.context!.globalState.update(
             "landingPage.dontShowThisAgain",
             message.data
           );
@@ -449,7 +449,7 @@ export class WebviewService {
 
   private GenerateContent(options: any) {
     const toReplace: Array<{}> = [];
-    options.items.forEach(option => {
+    options.items.forEach((option: any) => {
       if (typeof option.replace === "string") {
         toReplace.push({
           ...option,
@@ -469,7 +469,7 @@ export class WebviewService {
       )
       .replace(
         new RegExp("@PWD", "g"),
-        vscode.Uri.file(state.context.extensionPath)
+        vscode.Uri.file(state.context!.extensionPath)
           .with({
             scheme: "vscode-resource"
           })

@@ -136,14 +136,14 @@ export class Sync {
           customSettings.ignoreExtensions.length > 0
         ) {
           uploadedExtensions = uploadedExtensions.filter(extension => {
-            if (customSettings.ignoreExtensions.includes(extension.name)) {
+            if (customSettings.ignoreExtensions.includes(extension.name!)) {
               ignoredExtensions.push(extension);
               return false;
             }
             return true;
           });
         }
-        uploadedExtensions.sort((a, b) => a.name.localeCompare(b.name));
+        uploadedExtensions.sort((a, b) => a.name!.localeCompare(b.name!));
         const extensionFileName = state.environment.FILE_EXTENSION_NAME;
         const extensionFilePath = state.environment.FILE_EXTENSION;
         const extensionFileContent = JSON.stringify(
@@ -225,7 +225,7 @@ export class Sync {
       const file: File = new File(fileName, fileContent, "", fileName);
       allSettingFiles.push(file);
 
-      let completed: boolean = false;
+      let completed: boolean|undefined = false;
 
       let newGIST: boolean = false;
       try {
@@ -288,11 +288,11 @@ export class Sync {
             if (fileToUpload.gistName === "cloudSettings") {
               return false;
             }
-            if (!gistObj.data.files[fileToUpload.gistName]) {
+            if (!gistObj!.data.files[fileToUpload.gistName]) {
               return true;
             }
             if (
-              gistObj.data.files[fileToUpload.gistName].content !==
+              gistObj!.data.files[fileToUpload.gistName].content !==
               fileToUpload.content
             ) {
               console.info(`Sync: file ${fileToUpload.gistName} has changed`);
@@ -359,7 +359,7 @@ export class Sync {
         );
 
         gistObj = github.UpdateGIST(gistObj, allSettingFiles);
-        completed = await github.SaveGIST(gistObj.data);
+        completed = await github.SaveGIST(gistObj?.data);
         if (!completed) {
           vscode.window.showErrorMessage(
             localize("cmd.updateSettings.error.gistNotSave")
@@ -495,14 +495,14 @@ export class Sync {
         if (lastDownloadStr !== "") {
           upToDate =
             new Date(lastDownloadStr).getTime() ===
-            new Date(cloudSett.lastUpload).getTime();
+            new Date(cloudSett.lastUpload!).getTime();
         }
 
         if (lastUploadStr !== "") {
           upToDate =
             upToDate ||
             new Date(lastUploadStr).getTime() ===
-              new Date(cloudSett.lastUpload).getTime();
+              new Date(cloudSett.lastUpload!).getTime();
         }
 
         if (!syncSetting.forceDownload) {

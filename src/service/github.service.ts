@@ -1,7 +1,7 @@
 
 
-import {  Octokit } from "@octokit/rest";
-import * as HttpsProxyAgent from "https-proxy-agent";
+import  {Octokit}  from "@octokit/rest";
+import {HttpsProxyAgent} from "https-proxy-agent";
 import * as vscode from "vscode";
 import Commons from "../commons";
 import { CloudSettings } from "../models/cloudSettings.model";
@@ -16,14 +16,16 @@ interface IEnv {
   HTTP_PROXY: string;
 }
 
+
 interface IFixGistResponse extends Omit<Octokit.GistsGetResponse, "files"> {
   files: any | Octokit.GistsGetResponseFiles;
 }
 
+
 export class GitHubService {
-  public userName: string = null;
-  public name: string = null;
-  private github: Octokit = null;
+  public userName: string|null = null;
+  public name: string|null = null;
+  private github: Octokit|null = null;
   private GIST_JSON_EMPTY: any = {
     description: "Visual Studio Code Sync Settings Gist",
     public: false,
@@ -76,7 +78,7 @@ export class GitHubService {
       console.error(err);
     }
     if (userToken !== null && userToken !== "") {
-      this.github.users
+      this.github!.users
         .getAuthenticated({})
         .then(res => {
           this.userName = res.data.login;
@@ -104,7 +106,7 @@ export class GitHubService {
   public async CreateEmptyGIST(
     publicGist: boolean,
     gistDescription: string
-  ): Promise<string> {
+  ): Promise<string|undefined> {
     if (publicGist) {
       this.GIST_JSON_EMPTY.public = true;
     } else {
@@ -115,7 +117,7 @@ export class GitHubService {
     }
 
     try {
-      const res = await this.github.gists.create(this.GIST_JSON_EMPTY);
+      const res = await this.github!.gists.create(this.GIST_JSON_EMPTY);
       if (res.data && res.data.id) {
         return res.data.id.toString();
       } else {
@@ -132,8 +134,8 @@ export class GitHubService {
   // This should return GitHubApi.Response<GitHubApi.GistsGetResponse> but Types are wrong
   public async ReadGist(
     GIST: string
-  ): Promise<Octokit.Response<IFixGistResponse>> {
-    const promise = this.github.gists.get({ gist_id: GIST });
+  ): Promise<Octokit.Response<IFixGistResponse>|undefined> {
+    const promise = this.github!.gists.get({ gist_id: GIST });
     const res = await promise.catch(err => {
       if (String(err).includes("HttpError: Not Found")) {
         return Commons.LogException(err, "Sync: Invalid Gist ID", true);
@@ -143,6 +145,7 @@ export class GitHubService {
     if (res) {
       return res;
     }
+    return undefined;
   }
 
   public async IsGistNewer(
@@ -151,12 +154,13 @@ export class GitHubService {
   ): Promise<boolean> {
     const gist = await this.ReadGist(GIST);
     if (!gist) {
-      return;
+      // return; // old
+      return false;
     }
-    let gistCloudSetting: CloudSettings = null;
+    let gistCloudSetting: CloudSettings|null = null;
     try {
       gistCloudSetting = JSON.parse(gist.data.files.cloudSettings.content);
-      const gistLastUpload = new Date(gistCloudSetting.lastUpload);
+      const gistLastUpload = new Date(gistCloudSetting?.lastUpload!);
       if (!localLastDownload) {
         return false;
       }
@@ -186,11 +190,11 @@ export class GitHubService {
     return gistObject;
   }
 
-  public async SaveGIST(gistObject: any): Promise<boolean> {
+  public async SaveGIST(gistObject: any): Promise<boolean|undefined> {
     gistObject.gist_id = gistObject.id;
     // tslint:disable-next-line:comment-format
     //TODO : use github.gists.update when issue is fixed.
-    const promise = this.github.request("PATCH /gists/:gist_id", gistObject);
+    const promise = this.github!.request("PATCH /gists/:gist_id", gistObject);
     const res = await promise.catch(err => {
       if (String(err).includes("HttpError: Not Found")) {
         return Commons.LogException(err, "Sync: Invalid Gist ID", true);
@@ -201,5 +205,6 @@ export class GitHubService {
     if (res) {
       return true;
     }
+    return undefined;
   }
 }
