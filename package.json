@@ -106,6 +106,7 @@
     "test": "vscode-test"
   },
   "devDependencies": {
+    "@octokit/types": "^16.0.0",
     "@types/fs-extra": "^11.0.4",
     "@types/lockfile": "^1.0.4",
     "@types/mocha": "^10.0.10",
@@ -122,6 +123,7 @@
     "webpack-cli": "^6.0.1"
   },
   "dependencies": {
+    "@octokit/rest": "^19.0.13",
     "fs-extra": "^11.3.2",
     "lockfile": "^1.0.4",
     "recursive-readdir": "^2.2.3"

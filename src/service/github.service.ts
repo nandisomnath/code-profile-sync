@@ -1,4 +1,4 @@
-"use strict";
+
 
 import {  Octokit } from "@octokit/rest";
 import * as HttpsProxyAgent from "https-proxy-agent";

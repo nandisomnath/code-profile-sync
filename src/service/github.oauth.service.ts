@@ -58,11 +58,11 @@ export class GitHubOAuthService {
         this.server.close();
 
         const token = params.get("access_token");
-        this.saveToken(token);
+        this.saveToken(token!);
 
-        const user = await this.getUser(token, host);
+        const user = await this.getUser(token!, host);
 
-        const gists: any[] = await this.getGists(token, user, host);
+        const gists: any[] = await this.getGists(token!, user, host);
 
         const gistViewList: any[] = gists.map(m => {
           return {
@@ -73,7 +73,7 @@ export class GitHubOAuthService {
         });
 
         state.commons.webviewService.OpenGistSelectionpage(gistViewList, cmd);
-      } catch (err) {
+      } catch (err: any) {
         const error = new Error(err);
         Commons.LogException(error, state.commons.ERROR_MESSAGE, true);
       }
@@ -91,7 +91,7 @@ export class GitHubOAuthService {
       body: params
     });
 
-    promise.catch(err => {
+    promise.catch((err: Error) => {
       Commons.LogException(err, "Sync: Invalid GitHub Enterprise URL.", true);
     });
 
