@@ -241,6 +241,9 @@ export class WebviewService {
     );
     settingsPanel.webview.html = content;
     settingsPanel.webview.onDidReceiveMessage(async message => {
+      if (state.commons === null) {
+          throw new Error("state.commons is null");
+        }
       if (message === "openGist") {
         const [customConfig, extConfig] = await Promise.all([
           state.commons.GetCustomSettings(),
@@ -302,6 +305,9 @@ export class WebviewService {
     if (message.text === "true" || message.text === "false") {
       value = message.text === "true";
     }
+    if (state.commons === null) {
+          throw new Error("state.commons is null");
+        }
     if (message.type === "global") {
       if (has(customSettings, message.command)) {
         set(customSettings, message.command, value);
@@ -343,6 +349,9 @@ export class WebviewService {
       }
     );
     landingPanel.webview.onDidReceiveMessage(async message => {
+      if (state.commons === null) {
+          throw new Error("state.commons is null");
+        }
       switch (message.command) {
         case "loginWithGitHub":
           new GitHubOAuthService(54321).StartProcess(cmd);
@@ -430,6 +439,9 @@ export class WebviewService {
     gistSelectionPanel.webview.html = content;
     gistSelectionPanel.webview.onDidReceiveMessage(async message => {
       if (!message.close) {
+        if (state.commons === null) {
+          throw new Error("state.commons is null");
+        }
         const extSettings = await state.commons.GetSettings();
         extSettings.gist = message.id;
         state.commons.SaveSettings(extSettings);

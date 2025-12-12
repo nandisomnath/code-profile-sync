@@ -396,12 +396,18 @@ export class Sync {
           return;
         }
       } catch (err) {
+        if (state.commons === null) {
+          throw new Error("state.commons is null");
+        }
         Commons.LogException(err, state.commons.ERROR_MESSAGE, true);
         return;
       }
 
       if (completed) {
         try {
+          if (state.commons === null) {
+          throw new Error("state.commons is null");
+        }
           customSettings.lastUpload = dateNow;
           customSettings.lastDownload = dateNow;
           await state.commons.SaveSettings(syncSetting);
@@ -442,6 +448,9 @@ export class Sync {
             await state.commons.HandleStartWatching();
           }
         } catch (err) {
+          if (state.commons === null) {
+          throw new Error("state.commons is null");
+        }
           Commons.LogException(err, state.commons.ERROR_MESSAGE, true);
         }
       }
@@ -451,6 +460,9 @@ export class Sync {
    * Download setting from github gist
    */
   public async download(): Promise<void> {
+    if (state.commons === null) {
+          throw new Error("state.commons is null");
+        }
     const localSettings: LocalConfig = await state.commons.InitalizeSettings();
 
     if (
@@ -504,6 +516,9 @@ export class Sync {
         localSettings.publicGist = true;
       }
       const keys = Object.keys(res.data.files);
+      if (state.environment === null) {
+          throw new Error("state.environment is null");
+        }
       if (keys.indexOf(state.environment.FILE_CLOUDSETTINGS_NAME) > -1) {
         const cloudSettGist: object = JSON.parse(
           res.data.files[state.environment.FILE_CLOUDSETTINGS_NAME].content
@@ -565,6 +580,9 @@ export class Sync {
               );
               updatedFiles.push(f);
             } else if (gistName.indexOf(".") > -1) {
+              if (state.environment === null) {
+          throw new Error("state.environment is null");
+        }
               if (customSettings.universalKeybindings) {
                 if (gistName === state.environment.FILE_KEYBINDING_MAC) {
                   return;
@@ -705,6 +723,9 @@ export class Sync {
                     // TODO : add Name attribute in File and show information message here with name , when required.
                   })
                   .catch(err => {
+                    if (state.commons === null) {
+          throw new Error("state.commons is null");
+        }
                     Commons.LogException(
                       err,
                       state.commons.ERROR_MESSAGE,
@@ -719,6 +740,9 @@ export class Sync {
       }
 
       await Promise.all(actionList);
+       if (state.commons === null) {
+          throw new Error("state.commons is null");
+        }
       const settingsUpdated = await state.commons.SaveSettings(syncSetting);
       const customSettingsUpdated = await state.commons.SetCustomSettings(
         customSettings
@@ -780,7 +804,14 @@ export class Sync {
         state.context!.globalState.update("landingPage.dontShowThisAgain", false)
       ]);
 
+       if (state.commons === null) {
+          throw new Error("state.commons is null");
+        }
+         if (state.environment === null) {
+          throw new Error("state.environment is null");
+        }
       const [extSaved, customSaved, lockExist] = await Promise.all([
+        
         state.commons.SaveSettings(extSettings),
         state.commons.SetCustomSettings(localSettings),
         FileService.FileExists(state.environment.FILE_SYNC_LOCK!)
@@ -822,9 +853,12 @@ export class Sync {
     );
   }
   public async advance() {
+     if (state.commons === null) {
+          throw new Error("state.commons is null");
+        }
     const setting: ExtensionConfig = await state.commons.GetSettings();
     const customSettings: CustomConfig = await state.commons.GetCustomSettings();
-    if (customSettings == null) {
+    if (customSettings === null) {
       vscode.window
         .showInformationMessage(
           localize("cmd.otherOptions.triggerReset"),
@@ -838,8 +872,8 @@ export class Sync {
     }
     const localSetting: LocalConfig = new LocalConfig();
     const tokenAvailable: boolean =
-      customSettings.token != null && customSettings.token !== "";
-    const gistAvailable: boolean = setting.gist != null && setting.gist !== "";
+      customSettings.token !== null && customSettings.token !== "";
+    const gistAvailable: boolean = setting.gist !== null && setting.gist !== "";
 
     const items: string[] = [
       "cmd.otherOptions.openSettingsPage",
@@ -876,9 +910,15 @@ export class Sync {
 
     const handlerMap = [
       async () => {
+         if (state.commons === null) {
+          throw new Error("state.commons is null");
+        }
         state.commons.webviewService.OpenSettingsPage(customSettings, setting);
       },
       async () => {
+         if (state.environment === null) {
+          throw new Error("state.environment is null");
+        }
         const file: vscode.Uri = vscode.Uri.file(
           state.environment.FILE_CUSTOMIZEDSETTINGS!
         );
@@ -903,6 +943,9 @@ export class Sync {
           setting.gist = "";
           selectedItem = 1;
           customSettings.downloadPublicGist = false;
+           if (state.commons === null) {
+          throw new Error("state.commons is null");
+        }
           await state.commons.SetCustomSettings(customSettings);
         }
       },
@@ -911,6 +954,9 @@ export class Sync {
         selectedItem = 2;
         customSettings.downloadPublicGist = true;
         settingChanged = true;
+         if (state.commons === null) {
+          throw new Error("state.commons is null");
+        }
         await state.commons.SetCustomSettings(customSettings);
       },
       async () => {
@@ -972,6 +1018,9 @@ export class Sync {
             return;
           }
           customSettings.customFiles[fileName] = input;
+           if (state.commons === null) {
+          throw new Error("state.commons is null");
+        }
           const done: boolean = await state.commons.SetCustomSettings(
             customSettings
           );

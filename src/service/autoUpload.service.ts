@@ -16,28 +16,47 @@ export class AutoUploadService {
   }
 
   public watching = false;
-  private watcher?: FSWatcher;
+  private watcher: FSWatcher|null = null;
 
   constructor(private ignored: string[]) {
 
-    this.watcher = watch(state.environment.USER_FOLDER!, {
-    depth: 2,
-    ignored: this.ignored
-  });
+    if (state.environment === null || state.environment.USER_FOLDER === null) {
+      throw new Error("state.environment.USER_FOLDER is null");
+    }
+
+    this.watcher = watch(state.environment.USER_FOLDER, {
+      depth: 2,
+      ignored: this.ignored
+    });
 
     vscode.extensions.onDidChange(async () => {
       if (this.watching && vscode.window.state.focused) {
         console.log("Sync: Extensions changed");
+
+        if (state.environment === null) {
+          throw new Error("state.environment is null");
+        }
+
         if (await lockfile.Check(state.environment.FILE_SYNC_LOCK!)) {
           return;
         } else {
           await lockfile.Lock(state.environment.FILE_SYNC_LOCK!);
         }
+
+        if (state.commons === null) {
+          throw new Error("state.commons is null");
+        }
+
         const customConfig = await state.commons.GetCustomSettings();
         if (!customConfig.downloadPublicGist) {
           await this.InitiateAutoUpload();
         }
-        await lockfile.Unlock(state.environment.FILE_SYNC_LOCK!);
+
+        if (state.environment.FILE_SYNC_LOCK === null) {
+          throw new Error("state.environment.FILE_SYNC_LOCK is null");
+        }
+
+        await lockfile.Unlock(state.environment.FILE_SYNC_LOCK);
         return;
       }
     });
@@ -48,13 +67,26 @@ export class AutoUploadService {
 
     this.watching = true;
 
-    this.watcher!.addListener("change", async (path: string) => {
+    if (this.watcher === null) {
+      throw new Error("this.watcher is null");
+    }
+
+    this.watcher.addListener("change", async (path: string) => {
       if (this.watching && vscode.window.state.focused) {
         console.log(`Sync: ${FileService.ExtractFileName(path)} changed`);
-        if (await lockfile.Check(state.environment.FILE_SYNC_LOCK!)) {
+
+        if (state.environment === null || state.environment.FILE_SYNC_LOCK === null) {
+          throw new Error("state.environment.FILE_SYNC_LOCK is null");
+        }
+
+        if (await lockfile.Check(state.environment.FILE_SYNC_LOCK)) {
           return;
         } else {
-          await lockfile.Lock(state.environment.FILE_SYNC_LOCK!);
+          await lockfile.Lock(state.environment.FILE_SYNC_LOCK);
+        }
+
+        if (state.commons === null) {
+          throw new Error("state.commons is null");
         }
 
         const customConfig = await state.commons.GetCustomSettings();
@@ -83,6 +115,11 @@ export class AutoUploadService {
   }
 
   private async InitiateAutoUpload() {
+    
+    if (state.commons === null) {
+          throw new Error("state.commons is null");
+        }
+
     const customSettings = await state.commons.GetCustomSettings();
 
     vscode.window.setStatusBarMessage("").dispose();

@@ -15,6 +15,9 @@ export class GitHubOAuthService {
   }
 
   public async StartProcess(cmd?: string) {
+    if (state.commons === null) {
+          throw new Error("state.commons is null");
+        }
     const customSettings = await state.commons.GetCustomSettings();
     const host = customSettings.githubEnterpriseUrl
       ? new URL(customSettings.githubEnterpriseUrl)
@@ -72,9 +75,16 @@ export class GitHubOAuthService {
           };
         });
 
+        if (state.commons === null) {
+          throw new Error("state.commons is null");
+        }
+
         state.commons.webviewService.OpenGistSelectionpage(gistViewList, cmd);
       } catch (err: any) {
         const error = new Error(err);
+        if (state.commons === null) {
+          throw new Error("state.commons is null");
+        }
         Commons.LogException(error, state.commons.ERROR_MESSAGE, true);
       }
     });
@@ -114,6 +124,9 @@ export class GitHubOAuthService {
   }
 
   public async saveToken(token: string) {
+    if (state.commons === null) {
+          throw new Error("state.commons is null");
+        }
     const currentSettings = await state.commons.GetCustomSettings();
     currentSettings.token = token;
     state.commons.SetCustomSettings(currentSettings);

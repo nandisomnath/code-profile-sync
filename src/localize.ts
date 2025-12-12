@@ -3,9 +3,11 @@ import { resolve } from "path";
 import { extensions } from "vscode";
 import { ILanguagePack } from "./models/language-pack.model";
 
+
+
 export class Localize {
   private bundle = this.resolveLanguagePack();
-  private options?: { locale: string };
+  private options: { locale: string } | null = null;
 
   public localize(key: string, ...args: string[]): string {
     const message = this.bundle[key] || key;
@@ -38,20 +40,30 @@ export class Localize {
     const languageFormat = "package.nls{0}.json";
     const defaultLanguage = languageFormat.replace("{0}", "");
 
-    const rootPath = extensions.getExtension("Somnath.code-settings-sync")?.extensionPath;
+    const myExtension = extensions.getExtension("somnath.code-settings-sync");
+
+    if (myExtension === undefined) {
+      throw new Error("getExtension() is undefined");
+    }
+
+    const rootPath = myExtension.extensionPath;
+
+    if (this.options === null) {
+      throw new Error("options is null");
+    }
 
     const resolvedLanguage = this.recurseCandidates(
-      rootPath!,
+      rootPath,
       languageFormat,
-      this.options!.locale
+      this.options.locale
     );
 
-    const languageFilePath = resolve(rootPath!, resolvedLanguage);
+    const languageFilePath = resolve(rootPath, resolvedLanguage);
 
     try {
       const defaultLanguageBundle = JSON.parse(
         resolvedLanguage !== defaultLanguage
-          ? readFileSync(resolve(rootPath!, defaultLanguage), "utf-8")
+          ? readFileSync(resolve(rootPath, defaultLanguage), "utf-8")
           : "{}"
       );
 

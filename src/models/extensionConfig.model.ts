@@ -1,10 +1,10 @@
 export class ExtensionConfig {
   public gist: string|null = null;
-  public quietSync: boolean = false;
-  public removeExtensions: boolean = true;
-  public syncExtensions: boolean = true;
-  public autoDownload: boolean = false;
-  public autoUpload: boolean = false;
-  public forceDownload: boolean = false;
-  public forceUpload: boolean = false;
+  public quietSync: boolean|null = false;
+  public removeExtensions: boolean|null = true;
+  public syncExtensions: boolean|null = true;
+  public autoDownload: boolean|null = false;
+  public autoUpload: boolean|null = false;
+  public forceDownload: boolean|null = false;
+  public forceUpload: boolean|null = false;
 }

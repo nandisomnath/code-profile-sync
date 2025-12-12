@@ -284,7 +284,7 @@ export default class Commons {
     const keys = Object.keys(setting);
     keys.forEach(async keyName => {
       
-      if (setting[keyName as keyof ExtensionConfig] == null) {
+      if (setting[keyName as keyof ExtensionConfig] === null) {
         setting[keyName as keyof ExtensionConfig] = "" as any;
       }
       if (keyName.toLowerCase() !== "token") {
@@ -342,7 +342,7 @@ export default class Commons {
 
   public GetSettings(): ExtensionConfig {
     const settings = new ExtensionConfig();
-    const keys = Object.keys(settings) as (keyof ExtensionConfig)[];
+    const keys = Object.keys(settings);
 
     // settings.autoDownload = vscode.workspace.getConfiguration("sync").get("autoDownload");
     // settings.gist = vscode.workspace.getConfiguration("sync").get("gist");
@@ -354,13 +354,17 @@ export default class Commons {
     // settings.forceUpload = vscode.workspace.getConfiguration("sync").get("forceUpload");
     
     
-      for (const key of Object.keys(settings)) {
+    for (const key of Object.keys(settings)) {
       if (key !== "token") {
-        settings[key as keyof ExtensionConfig] = vscode.workspace.getConfiguration("code-profile-sync").get(key);
+        settings[key as keyof ExtensionConfig] = vscode.workspace.getConfiguration("code-profile-sync").get(key)!;
       }
     }
+
+    if (settings.gist === null) {
+      throw new Error("setting.gist is null");
+    }
     
-    settings.gist = settings.gist!.trim();
+    settings.gist = settings.gist.trim();
     return settings;
   }
 
