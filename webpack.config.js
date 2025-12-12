@@ -46,11 +46,11 @@ const extensionConfig = {
     level: "log", // enables logging required for problem matchers
   },
 
-   plugins: [
-    new IgnorePlugin({
-      resourceRegExp: /^vscode-fsevents$/ // ignore this optional module
-    })
-  ],
+  //  plugins: [
+  //   new IgnorePlugin({
+  //     resourceRegExp: /^vscode-fsevents$/ // ignore this optional module
+  //   })
+  // ],
 
 };
 module.exports = [ extensionConfig ];

@@ -13,7 +13,9 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "*"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
@@ -130,12 +132,12 @@
   "dependencies": {
     "@octokit/rest": "^16.43.2",
     "@types/lodash": "^4.17.21",
+    "chokidar": "^4.0.3",
     "express": "^5.2.1",
     "fs-extra": "^11.3.2",
     "lockfile": "^1.0.4",
     "lodash": "^4.17.21",
     "node-fetch": "^2.7.0",
-    "recursive-readdir": "^2.2.3",
-    "vscode-chokidar": "^2.1.7"
+    "recursive-readdir": "^2.2.3"
   }
 }
