@@ -277,6 +277,7 @@ export default class Commons {
     return true;
   }
 
+  // todo: fix me
   public async SaveSettings(setting: ExtensionConfig): Promise<boolean> {
     const config = vscode.workspace.getConfiguration("sync");
     const allKeysUpdated = new Array<Thenable<void>>();
@@ -296,7 +297,7 @@ export default class Commons {
 
     try {
       await Promise.all(allKeysUpdated);
-      if (state.context.globalState.get("syncCounter")) {
+      if (state.context?.globalState.get("syncCounter")) {
         const counter = state.context.globalState.get("syncCounter");
         let count: number = parseInt(counter + "", 10);
         if (count % 450 === 0) {
@@ -305,7 +306,7 @@ export default class Commons {
         count = count + 1;
         state.context.globalState.update("syncCounter", count);
       } else {
-        state.context.globalState.update("syncCounter", 1);
+        state.context?.globalState.update("syncCounter", 1);
       }
       return true;
     } catch (err) {
@@ -342,14 +343,25 @@ export default class Commons {
 
   public GetSettings(): ExtensionConfig {
     const settings = new ExtensionConfig();
+    const keys = Object.keys(settings) as (keyof ExtensionConfig)[];
 
-    for (const key of Object.keys(settings)) {
+    // settings.autoDownload = vscode.workspace.getConfiguration("sync").get("autoDownload");
+    // settings.gist = vscode.workspace.getConfiguration("sync").get("gist");
+    // settings.quietSync = vscode.workspace.getConfiguration("sync").get("quietSync");
+    // settings.removeExtensions = vscode.workspace.getConfiguration("sync").get("removeExtensions");
+    // settings.syncExtensions = vscode.workspace.getConfiguration("sync").get("syncExtensions");
+    // settings.autoUpload = vscode.workspace.getConfiguration("sync").get("autoUpload");
+    // settings.forceDownload = vscode.workspace.getConfiguration("sync").get("forceDownload");
+    // settings.forceUpload = vscode.workspace.getConfiguration("sync").get("forceUpload");
+    
+    
+      for (const key of Object.keys(settings)) {
       if (key !== "token") {
-        settings[key] = vscode.workspace.getConfiguration("sync").get(key);
+        settings[key as keyof ExtensionConfig] = vscode.workspace.getConfiguration("sync").get(key);
       }
     }
-
-    settings.gist = settings.gist.trim();
+    
+    settings.gist = settings.gist!.trim();
     return settings;
   }
 
@@ -377,7 +389,7 @@ export default class Commons {
     const gist = ((await vscode.window.showInputBox(opt)) || "").trim();
 
     if (gist && gist !== "esc") {
-      sett.gist = gist;
+      sett.gist = gist as any;
       const saved = await this.SaveSettings(sett);
       if (saved) {
         vscode.window.setStatusBarMessage(
@@ -387,6 +399,7 @@ export default class Commons {
       }
       return gist;
     }
+    return "";
   }
 
   /**
@@ -398,10 +411,10 @@ export default class Commons {
     const keysUpdated: Array<Thenable<void>> = [];
 
     for (const key of settings) {
-      let keyValue: object = null;
+      let keyValue: object|null = null;
       keyValue = config.get<null>(key, null);
       if (keyValue !== null) {
-        ignoreSettings[key] = keyValue;
+        ignoreSettings[key as keyof object] = keyValue;
         keysUpdated.push(config.update(key, undefined, true));
       }
     }
@@ -418,14 +431,14 @@ export default class Commons {
     const config = vscode.workspace.getConfiguration();
     const keysUpdated: Array<Thenable<void>> = [];
     for (const key of Object.keys(ignoredSettings)) {
-      keysUpdated.push(config.update(key, ignoredSettings[key], true));
+      keysUpdated.push(config.update(key, ignoredSettings[key as keyof object], true));
     }
   }
 
   /**
    * AskGistDescription
    */
-  public async AskGistDescription(): Promise<string> {
+  public async AskGistDescription(): Promise<string|undefined> {
     return vscode.window.showInputBox({
       prompt: localize("common.prompt.multipleGist"),
       ignoreFocusOut: true,
