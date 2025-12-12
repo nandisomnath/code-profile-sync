@@ -14,11 +14,83 @@
   "contributes": {
     "commands": [
       {
-        "command": "code-profile-sync.helloWorld",
-        "title": "Hello World"
+        "command": "extension.HowSettings",
+        "title": "%cmd.howSetting.title%"
+      },
+      {
+        "command": "extension.downloadSettings",
+        "title": "%cmd.downloadSettings.title%"
+      },
+      {
+        "command": "extension.updateSettings",
+        "title": "%cmd.updateSettings.title%"
+      },
+      {
+        "command": "extension.resetSettings",
+        "title": "%cmd.resetSettings.title%"
+      },
+      {
+        "command": "extension.otherOptions",
+        "title": "%cmd.otherOptions.title%"
       }
-    ]
+    ],
+    "keybindings": [
+      {
+        "key": "alt+shift+u",
+        "command": "extension.updateSettings"
+      },
+      {
+        "key": "alt+shift+d",
+        "command": "extension.downloadSettings"
+      }
+    ],
+    "configuration": {
+      "properties": {
+        "sync.gist": {
+          "type": "string",
+          "default": "",
+          "description": "%ext.config.gist%"
+        },
+        "sync.autoDownload": {
+          "type": "boolean",
+          "default": false,
+          "description": "%ext.config.autoDownload%"
+        },
+        "sync.autoUpload": {
+          "type": "boolean",
+          "default": false,
+          "description": "%ext.config.autoUpload%"
+        },
+        "sync.forceDownload": {
+          "type": "boolean",
+          "default": false,
+          "description": "%ext.config.forceDownload%"
+        },
+        "sync.forceUpload": {
+          "type": "boolean",
+          "default": false,
+          "description": "%ext.config.forceUpload%"
+        },
+        "sync.quietSync": {
+          "type": "boolean",
+          "default": false,
+          "description": "%ext.config.quietSync%"
+        },
+        "sync.removeExtensions": {
+          "type": "boolean",
+          "default": true,
+          "description": "%ext.config.removeExtensions%"
+        },
+        "sync.syncExtensions": {
+          "type": "boolean",
+          "default": true,
+          "description": "%ext.config.syncExtensions%"
+        }
+      },
+      "title": "%ext.config.title%"
+    }
   },
+
   "scripts": {
     "vscode:prepublish": "npm run package",
     "compile": "webpack",
