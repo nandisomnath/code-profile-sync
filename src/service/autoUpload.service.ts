@@ -37,10 +37,14 @@ export class AutoUploadService {
           throw new Error("state.environment is null");
         }
 
-        if (await lockfile.Check(state.environment.FILE_SYNC_LOCK!)) {
+        if (state.environment.FILE_SYNC_LOCK === null) {
+          throw new Error("state.environment.FILE_SYNC_LOCK is null");
+        }
+        
+        if (await lockfile.Check(state.environment.FILE_SYNC_LOCK)) {
           return;
         } else {
-          await lockfile.Lock(state.environment.FILE_SYNC_LOCK!);
+          await lockfile.Lock(state.environment.FILE_SYNC_LOCK);
         }
 
         if (state.commons === null) {
@@ -101,7 +105,7 @@ export class AutoUploadService {
             await this.InitiateAutoUpload();
           }
         }
-        await lockfile.Unlock(state.environment.FILE_SYNC_LOCK!);
+        await lockfile.Unlock(state.environment.FILE_SYNC_LOCK);
         return;
       }
     });

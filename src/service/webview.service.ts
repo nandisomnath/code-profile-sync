@@ -404,7 +404,10 @@ export class WebviewService {
           vscode.commands.executeCommand("extension.downloadSettings");
           break;
         case "dontShowThisAgain":
-          await state.context!.globalState.update(
+          if (state.context === null) {
+            throw new Error("state.context is null");
+          }
+          await state.context.globalState.update(
             "landingPage.dontShowThisAgain",
             message.data
           );
@@ -480,6 +483,9 @@ export class WebviewService {
         });
       }
     });
+    if (state.context === null) {
+      throw new Error("state.context is null");
+    }
     return toReplace
       .reduce(
         (acc, cur: any) => acc.replace(new RegExp(cur.find, "g"), cur.replace),
@@ -487,7 +493,7 @@ export class WebviewService {
       )
       .replace(
         new RegExp("@PWD", "g"),
-        vscode.Uri.file(state.context!.extensionPath)
+        vscode.Uri.file(state.context.extensionPath)
           .with({
             scheme: "vscode-resource"
           })

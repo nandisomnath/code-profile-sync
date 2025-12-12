@@ -78,7 +78,10 @@ export class GitHubService {
       console.error(err);
     }
     if (userToken !== null && userToken !== "") {
-      this.github!.users
+      if (this.github === null) {
+        throw new Error("this.github is null");
+      }
+      this.github.users
         .getAuthenticated({})
         .then(res => {
           this.userName = res.data.login;
@@ -117,7 +120,10 @@ export class GitHubService {
     }
 
     try {
-      const res = await this.github!.gists.create(this.GIST_JSON_EMPTY);
+      if (this.github === null) {
+        throw new Error("this.github is null");
+      }
+      const res = await this.github.gists.create(this.GIST_JSON_EMPTY);
       if (res.data && res.data.id) {
         return res.data.id.toString();
       } else {
@@ -135,7 +141,10 @@ export class GitHubService {
   public async ReadGist(
     GIST: string
   ): Promise<Octokit.Response<IFixGistResponse>> {
-    const promise = this.github!.gists.get({ gist_id: GIST });
+    if (this.github === null) {
+      throw new Error("this.github is null");
+    }
+    const promise = this.github.gists.get({ gist_id: GIST });
     const res = await promise.catch(err => {
       if (String(err).includes("HttpError: Not Found")) {
         return Commons.LogException(err, "Sync: Invalid Gist ID", true);
@@ -167,7 +176,13 @@ export class GitHubService {
     let gistCloudSetting: CloudSettings|null = null;
     try {
       gistCloudSetting = JSON.parse(gist.data.files.cloudSettings.content);
-      const gistLastUpload = new Date(gistCloudSetting?.lastUpload!);
+      if (gistCloudSetting === null) {
+        throw new Error("gistCloudSetting is null");
+      }
+      if (gistCloudSetting.lastUpload === null) {
+        throw new Error("gistCloudSetting.lastUpload is null");
+      }
+      const gistLastUpload = new Date(gistCloudSetting.lastUpload);
       if (!localLastDownload) {
         return false;
       }
@@ -197,11 +212,14 @@ export class GitHubService {
     return gistObject;
   }
 
-  public async SaveGIST(gistObject: any): Promise<boolean|undefined> {
+  public async SaveGIST(gistObject: any): Promise<boolean> {
     gistObject.gist_id = gistObject.id;
     // tslint:disable-next-line:comment-format
     //TODO : use github.gists.update when issue is fixed.
-    const promise = this.github!.request("PATCH /gists/:gist_id", gistObject);
+    if (this.github === null) {
+      throw new Error("this.github is null");
+    }
+    const promise = this.github.request("PATCH /gists/:gist_id", gistObject);
     const res = await promise.catch(err => {
       if (String(err).includes("HttpError: Not Found")) {
         return Commons.LogException(err, "Sync: Invalid Gist ID", true);
@@ -215,6 +233,6 @@ export class GitHubService {
     if (res) {
       return true;
     }
-    return undefined;
+    return false;
   }
 }

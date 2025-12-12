@@ -93,9 +93,13 @@ export class Sync {
         localConfig.publicGist = true;
       }
 
+      if (localConfig.customConfig.githubEnterpriseUrl === null) {
+        throw new Error("localConfig.customConfig.githubEnterpriseUrl is null");
+      }
+
       github = new GitHubService(
         localConfig.customConfig.token,
-        localConfig.customConfig.githubEnterpriseUrl!
+        localConfig.customConfig.githubEnterpriseUrl
       );
 
       await startGitProcess.call(
@@ -104,7 +108,7 @@ export class Sync {
         localConfig.customConfig
       );
     } catch (error) {
-      Commons.LogException(error, state.commons?.ERROR_MESSAGE!, true);
+      Commons.LogException(error, state.commons.ERROR_MESSAGE, true);
       return;
     }
 
@@ -141,7 +145,10 @@ export class Sync {
           customSettings.ignoreExtensions.length > 0
         ) {
           uploadedExtensions = uploadedExtensions.filter(extension => {
-            if (customSettings.ignoreExtensions.includes(extension.name!)) {
+            if (extension.name === null) {
+              throw new Error("extension.name is null");
+            }
+            if (customSettings.ignoreExtensions.includes(extension.name)) {
               ignoredExtensions.push(extension);
               return false;
             }
@@ -166,7 +173,7 @@ export class Sync {
         const extensionFile: File = new File(
           extensionFileName,
           extensionFileContent,
-          extensionFilePath!,
+          extensionFilePath,
           extensionFileName
         );
         allSettingFiles.push(extensionFile);
@@ -186,8 +193,12 @@ export class Sync {
         customSettings
       );
 
+      if (state.environment.FILE_CUSTOMIZEDSETTINGS === null) {
+        throw new Error("state.environment.FILE_CUSTOMIZEDSETTINGS is null");
+      }
+
       const customExist: boolean = await FileService.FileExists(
-        state.environment.FILE_CUSTOMIZEDSETTINGS!
+        state.environment.FILE_CUSTOMIZEDSETTINGS
       );
       if (customExist) {
         const customFileKeys: string[] = Object.keys(
@@ -239,7 +250,7 @@ export class Sync {
                 return;
               }
             }
-            allSettingFiles.push(snippetFile!);
+            allSettingFiles.push(snippetFile);
           }
         }
       }
@@ -251,7 +262,7 @@ export class Sync {
       const file: File = new File(fileName, fileContent, "", fileName);
       allSettingFiles.push(file);
 
-      let completed: boolean|undefined = false;
+      let completed: boolean = false;
 
       let newGIST: boolean = false;
       try {
@@ -317,7 +328,7 @@ export class Sync {
             if (fileToUpload.gistName === "cloudSettings") {
               return false;
             }
-            if (!gistObj!.data.files[fileToUpload.gistName]) {
+            if (!gistObj.data.files[fileToUpload.gistName]) {
               return true;
             }
             if (
@@ -340,10 +351,15 @@ export class Sync {
           }
           // Fall through to upload code for forced upload case.
         } else {
+
+          if (customSettings.lastDownload === null) {
+            throw new Error("customSettings.lastDownload is null");
+          }
+
           // Gist files are different from the local files.
           const gistNewer = await github.IsGistNewer(
-            syncSetting.gist!,
-            customSettings.lastDownload!
+            syncSetting.gist,
+            customSettings.lastDownload
           );
           if (!customSettings.lastDownload) {
             // Unable to compare the last gist upload time with the
@@ -388,7 +404,7 @@ export class Sync {
         );
 
         gistObj = github.UpdateGIST(gistObj, allSettingFiles);
-        completed = await github.SaveGIST(gistObj?.data);
+        completed = await github.SaveGIST(gistObj.data);
         if (!completed) {
           vscode.window.showErrorMessage(
             localize("cmd.updateSettings.error.gistNotSave")
@@ -416,7 +432,7 @@ export class Sync {
             vscode.window.showInformationMessage(
               localize(
                 "cmd.updateSettings.info.uploadingDone",
-                syncSetting.gist!
+                syncSetting.gist
               )
             );
           }
@@ -489,9 +505,12 @@ export class Sync {
       syncSetting: ExtensionConfig,
       customSettings: CustomConfig
     ) {
+      if (customSettings.githubEnterpriseUrl === null) {
+        throw new Error("customSettings.githubEnterpriseUrl is null");
+      }
       const github = new GitHubService(
         customSettings.token,
-        customSettings.githubEnterpriseUrl!
+        customSettings.githubEnterpriseUrl
       );
       vscode.window.setStatusBarMessage("").dispose();
       vscode.window.setStatusBarMessage(
@@ -499,7 +518,11 @@ export class Sync {
         2000
       );
 
-      const res = await github.ReadGist(syncSetting.gist!);
+      if (syncSetting.gist === null) {
+        throw new Error("syncSetting.gist is null");
+      }
+
+      const res = await github.ReadGist(syncSetting.gist);
 
       if (!res) {
         return;
@@ -536,17 +559,22 @@ export class Sync {
           : "";
 
         let upToDate: boolean = false;
+
+        if (cloudSett.lastUpload === null) {
+          throw new Error("cloudSett.lastUpload is null");
+        }
+
         if (lastDownloadStr !== "") {
           upToDate =
             new Date(lastDownloadStr).getTime() ===
-            new Date(cloudSett.lastUpload!).getTime();
+            new Date(cloudSett.lastUpload).getTime();
         }
 
         if (lastUploadStr !== "") {
           upToDate =
             upToDate ||
             new Date(lastUploadStr).getTime() ===
-              new Date(cloudSett.lastUpload!).getTime();
+              new Date(cloudSett.lastUpload).getTime();
         }
 
         if (!syncSetting.forceDownload) {
@@ -654,7 +682,10 @@ export class Sync {
                   ignoredExtensions,
                   (message: string, dispose: boolean) => {
                     if (!syncSetting.quietSync) {
-                      Commons.outputChannel!.appendLine(message);
+                      if (Commons.outputChannel === null) {
+                        throw new Error("Commons.outputChannel is null");
+                      }
+                      Commons.outputChannel.appendLine(message);
                     } else {
                       console.log(message);
                       if (dispose) {
@@ -693,8 +724,11 @@ export class Sync {
               if (file.filePath !== null) {
                 filePath = await FileService.CreateCustomDirTree(file.filePath);
               } else {
+                if (state.environment.USER_FOLDER === null) {
+                  throw new Error("state.environment.USER_FOLDER is null");
+                }
                 filePath = await FileService.CreateDirTree(
-                  state.environment.USER_FOLDER!,
+                  state.environment.USER_FOLDER,
                   file.fileName
                 );
               }
@@ -707,12 +741,18 @@ export class Sync {
                 const fileExists = await FileService.FileExists(filePath);
 
                 if (fileExists) {
+                  if (state.environment.OsType === null) {
+                    throw new Error("state.environment.OsType is null");
+                  }
+                  if (localSettings.customConfig.hostName === null) {
+                    throw new Error("localSettings.customConfig.hostName is null");
+                  }
                   const localContent = await FileService.ReadFile(filePath);
                   content = PragmaUtil.processBeforeWrite(
                     localContent,
                     content,
-                    state.environment.OsType!,
-                    localSettings.customConfig.hostName!
+                    state.environment.OsType,
+                    localSettings.customConfig.hostName
                   );
                 }
               }
@@ -796,12 +836,16 @@ export class Sync {
       2000
     );
 
+    if (state.context === null) {
+      throw new Error("state.context is null");
+    }
+
     try {
       extSettings = new ExtensionConfig();
       localSettings = new CustomConfig();
-
+      
       await Promise.all([
-        state.context!.globalState.update("landingPage.dontShowThisAgain", false)
+        state.context.globalState.update("landingPage.dontShowThisAgain", false)
       ]);
 
        if (state.commons === null) {
@@ -810,20 +854,24 @@ export class Sync {
          if (state.environment === null) {
           throw new Error("state.environment is null");
         }
+
+        if (state.environment.FILE_SYNC_LOCK === null) {
+          throw new Error("state.environment.FILE_SYNC_LOCK is null");
+        }
       const [extSaved, customSaved, lockExist] = await Promise.all([
         
         state.commons.SaveSettings(extSettings),
         state.commons.SetCustomSettings(localSettings),
-        FileService.FileExists(state.environment.FILE_SYNC_LOCK!)
+        FileService.FileExists(state.environment.FILE_SYNC_LOCK)
       ]);
 
       if (!lockExist) {
-        fs.closeSync(fs.openSync(state.environment.FILE_SYNC_LOCK!, "w"));
+        fs.closeSync(fs.openSync(state.environment.FILE_SYNC_LOCK, "w"));
       }
 
       // check is sync locking
-      if (await lockfile.Check(state.environment.FILE_SYNC_LOCK!)) {
-        await lockfile.Unlock(state.environment.FILE_SYNC_LOCK!);
+      if (await lockfile.Check(state.environment.FILE_SYNC_LOCK)) {
+        await lockfile.Unlock(state.environment.FILE_SYNC_LOCK);
       }
 
       if (extSaved && customSaved) {
@@ -1192,11 +1240,19 @@ export class Sync {
     customSettings: CustomConfig,
     syncSetting: ExtensionConfig
   ): Promise<File[]> {
+    if (customSettings.githubEnterpriseUrl === null) {
+      throw new Error("customSettings.githubEnterpriseUrl is null");
+    }
     const github = new GitHubService(
       customSettings.token,
-      customSettings.githubEnterpriseUrl!
+      customSettings.githubEnterpriseUrl
     );
-    const res = await github.ReadGist(syncSetting.gist!);
+
+    if (syncSetting.gist === null) {
+      throw new Error("syncSetting.gist is null");
+    }
+
+    const res = await github.ReadGist(syncSetting.gist);
     if (!res) {
       return [];
     }

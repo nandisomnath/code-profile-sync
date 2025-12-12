@@ -7,7 +7,7 @@ import { state } from "../state";
 
 export class GitHubOAuthService {
   public app: express.Express;
-  public server: Server|null = null;
+  public server: Server | null = null;
 
   constructor(public port: number) {
     this.app = express();
@@ -16,8 +16,8 @@ export class GitHubOAuthService {
 
   public async StartProcess(cmd?: string) {
     if (state.commons === null) {
-          throw new Error("state.commons is null");
-        }
+      throw new Error("state.commons is null");
+    }
     const customSettings = await state.commons.GetCustomSettings();
     const host = customSettings.githubEnterpriseUrl
       ? new URL(customSettings.githubEnterpriseUrl)
@@ -25,6 +25,9 @@ export class GitHubOAuthService {
 
     this.server = this.app.listen(this.port);
     this.app.get("/callback", async (req, res) => {
+      if (this.server === null) {
+        throw new Error("this.server is null");
+      }
       try {
         const params = new URLSearchParams(
           await (await this.getToken(req.query.code as string, host)).text()
@@ -58,14 +61,19 @@ export class GitHubOAuthService {
           </body>
         </html>
         `);
-        this.server!.close();
+        this.server.close();
 
         const token = params.get("access_token");
-        this.saveToken(token!);
 
-        const user = await this.getUser(token!, host);
+        if (token === null) {
+          throw new Error("token is null");
+        }
 
-        const gists: any[] = await this.getGists(token!, user, host);
+        this.saveToken(token);
+
+        const user = await this.getUser(token, host);
+
+        const gists: any[] = await this.getGists(token, user, host);
 
         const gistViewList: any[] = gists.map(m => {
           return {
@@ -125,8 +133,8 @@ export class GitHubOAuthService {
 
   public async saveToken(token: string) {
     if (state.commons === null) {
-          throw new Error("state.commons is null");
-        }
+      throw new Error("state.commons is null");
+    }
     const currentSettings = await state.commons.GetCustomSettings();
     currentSettings.token = token;
     state.commons.SetCustomSettings(currentSettings);
