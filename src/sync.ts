@@ -175,7 +175,7 @@ export class Sync {
         if (customFileKeys.length > 0) {
           for (const key of customFileKeys) {
             const val = customSettings.customFiles[key];
-            const customFile: File = await FileService.GetCustomFile(val, key);
+            const customFile: File|null = await FileService.GetCustomFile(val, key);
             if (customFile !== null) {
               allSettingFiles.push(customFile);
             }
@@ -186,21 +186,21 @@ export class Sync {
         return;
       }
       for (const snippetFile of contentFiles) {
-        if (snippetFile.fileName !== state.environment.FILE_KEYBINDING_MAC) {
-          if (snippetFile.content !== "") {
+        if (snippetFile?.fileName !== state.environment.FILE_KEYBINDING_MAC) {
+          if (snippetFile?.content !== "") {
             if (
-              snippetFile.fileName === state.environment.FILE_KEYBINDING_NAME
+              snippetFile?.fileName === state.environment.FILE_KEYBINDING_NAME
             ) {
-              snippetFile.gistName =
+              snippetFile!.gistName =
                 state.environment.OsType === OsType.MAC &&
                 !customSettings.universalKeybindings
                   ? state.environment.FILE_KEYBINDING_MAC
                   : state.environment.FILE_KEYBINDING_DEFAULT;
             }
             if (
-              snippetFile.fileName === state.environment.FILE_SETTING_NAME ||
-              snippetFile.fileName === state.environment.FILE_KEYBINDING_MAC ||
-              snippetFile.fileName === state.environment.FILE_KEYBINDING_DEFAULT
+              snippetFile?.fileName === state.environment.FILE_SETTING_NAME ||
+              snippetFile?.fileName === state.environment.FILE_KEYBINDING_MAC ||
+              snippetFile?.fileName === state.environment.FILE_KEYBINDING_DEFAULT
             ) {
               try {
                 const parsedContent = await PragmaUtil.processBeforeUpload(
@@ -213,7 +213,7 @@ export class Sync {
                 return;
               }
             }
-            allSettingFiles.push(snippetFile);
+            allSettingFiles.push(snippetFile!);
           }
         }
       }

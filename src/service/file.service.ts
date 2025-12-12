@@ -2,8 +2,9 @@
 
 import * as fs from "fs-extra";
 import * as path from "path";
-import * as recursiveRead from "recursive-readdir";
+import recursiveRead from "recursive-readdir";
 import { CustomConfig } from "../models/customConfig.model";
+
 
 export class File {
   constructor(
@@ -38,7 +39,7 @@ export class FileService {
   public static async GetFile(
     filePath: string,
     fileName: string
-  ): Promise<File> {
+  ): Promise<File|null> {
     const fileExists: boolean = await FileService.FileExists(filePath);
 
     if (!fileExists) {
@@ -98,7 +99,7 @@ export class FileService {
   public static async ListFiles(
     directory: string,
     customSettings: CustomConfig
-  ): Promise<File[]> {
+  ): Promise<(File|null)[]> {
     function folderMatcher(file: string, stats: fs.Stats) {
       if (stats.isDirectory()) {
         return customSettings.ignoreUploadFolders.some(fold => {
@@ -136,7 +137,7 @@ export class FileService {
     let fullPath: string = userFolder;
     let result: string;
 
-    let paths: string[] = null;
+    let paths: string[]|null = null;
     if (fileName.indexOf("|") > -1) {
       paths = fileName.split("|");
     } else if (fileName.indexOf("//") > -1) {
@@ -187,7 +188,7 @@ export class FileService {
     try {
       await fs.mkdir(name);
       return true;
-    } catch (err) {
+    } catch (err:any) {
       if (err.code === "EEXIST") {
         return false;
       }
@@ -198,7 +199,7 @@ export class FileService {
   public static async GetCustomFile(
     filePath: string,
     fileName: string
-  ): Promise<File> {
+  ): Promise<File|null> {
     const fileExists: boolean = await FileService.FileExists(filePath);
 
     if (!fileExists) {
